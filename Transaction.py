@@ -12,3 +12,8 @@ class Transaction:
         dateOfTrans = datetime.datetime(1970,1,1)
         amount = 0.0
         transCategory = transCat.TransCategory()
+
+    def printTrans(self):
+        print("Description: " + self.description)
+        print("Category: " + self.transCategory.name)
+        print("Amount: " + str(self.amount))

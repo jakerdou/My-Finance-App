@@ -18,8 +18,17 @@ me.email = "jakerdou@tamu.edu"
 myCash = pm.PaymentMethod()
 myCash.name = "Cash"
 myCash.balance = 450.0
-me.pmList.append(myCash)
+myFood = transCat.TransCategory()
+myFood.name = "Food"
+myWhata = trans.Transaction()
+myWhata.description = "whataburger"
+myWhata.amount = 4.20
+myWhata.transCategory = myFood
+
 userList.append(me)
+me.pmList.append(myCash)
+myCash.AddCategory(myFood)
+myCash.AddTransaction(myFood, myWhata)
 #FIXME: this
 
 
@@ -33,7 +42,10 @@ while(not (selection == "0")):
     print("* Enter 2 for: add payment method                         *")
     print("* Enter 3 for: add category to payment method             *")
     print("* Enter 4 for: add transaction to payment method          *")
-    print("* Enter 5 for: switch to different user                   *")
+    print("* Enter 5 for: view payment methods                       *")
+    print("* Enter 6 for: view categories                            *")
+    print("* Enter 7 for: view transactions                          *")
+    print("* Enter 8 for: switch to different user                   *")
     print(stars + "\n")
 
     selection = input("Enter your selection: ")
@@ -63,7 +75,7 @@ while(not (selection == "0")):
 
     if(selection == "3"):
         if(len(userList) == 0 or len(userList[currUser].pmList) == 0):
-            print("\nYou must create a user with payment methods before adding transactions.")
+            print("\nYou must create a user with payment methods before adding categories.")
             print(stars + "\n")
         else:
             print("Payment methods for this user: ")
@@ -75,7 +87,7 @@ while(not (selection == "0")):
 
             newCat = transCat.TransCategory
             newCat.name = input("What is the name of the category? ")
-            expenseYorN = input("Is the category an expense? (Enter 'y' if yes) ")
+            expenseYorN = input("Is the category an expense? (Enter 'y' or 'n') ")
 
             if(expenseYorN == "y"):
                 newCat.isExpense = True
@@ -95,8 +107,8 @@ while(not (selection == "0")):
             for i in range(len(userList[currUser].pmList)):
                 print("Enter " + str(i) + " for: " + userList[currUser].pmList[i].name)
 
-            pmSelectedInd = int(input("\nWhich payment method would you like to add a transaction to? "))
-            pmSelected = userList[currUser].pmList[pmSelectedInd]
+            pmSelectedIndex = int(input("\nWhich payment method would you like to add a transaction to? "))
+            pmSelected = userList[currUser].pmList[pmSelectedIndex]
             #FIXME: need to validate input
 
             #check if this payment method has categories to add to
@@ -114,12 +126,92 @@ while(not (selection == "0")):
                 for i in range(len(pmSelected.categoryList)):
                     print("Enter " + str(i) + " for: " + pmSelected.categoryList[i].name)
 
-                catSelected = int(input("\nWhich category does the transaction fit into? "))
-                newTrans.category = pmSelected.categoryList[catSelected]
+                catSelectedIndex = int(input("\nWhich category does the transaction fit into? "))
+                catSelected = pmSelected.categoryList[catSelectedIndex]
+
+                newTrans.category = catSelected
 
                 #add transaction to list
-                userList[currUser].pmList[pmSelectedInd].transList.append(newTrans)
+                pmSelected.AddTransaction(catSelected, newTrans)
+                #FIXME: add "x amount has been added/subtracted from balance of y"
                 print("\nTransaction Added!\n" + stars + "\n")
+
+
+    if(selection == "5"):
+        #check if they have payment methods
+        print("Payment Methods for " + userList[currUser].name + "\n")
+        for i in userList[currUser].pmList:
+            i.printPM()
+            print()
+
+        print(stars + "\n")
+
+
+    if(selection == "6"):
+        if(len(userList) == 0 or len(userList[currUser].pmList) == 0):
+            print("\nYou must create a user with payment methods before viewing categories.")
+            print(stars + "\n")
+        else:
+            print("Payment methods for " + userList[currUser].name + "\n")
+            for i in range(len(userList[currUser].pmList)):
+                print("Enter " + str(i) + " for: " + userList[currUser].pmList[i].name)
+
+            pmSelectedIndex = int(input("\nWhich payment method would you like to view the categories of? "))
+            #FIXME: need to validate input
+
+            if(len(userList[currUser].pmList[pmSelectedIndex].categoryList) == 0):
+                print("You must add categories to this payment method before viewing them.")
+                print(stars + "\n")
+            else:
+                print("Categories for " + userList[currUser].pmList[pmSelectedIndex].name + "\n")
+                for i in userList[currUser].pmList[pmSelectedIndex].categoryList:
+                    i.printCat()
+                    print()
+
+                print(stars + "\n")
+
+
+    if(selection == "7"):
+        if(len(userList) == 0 or len(userList[currUser].pmList) == 0):
+            print("\nYou must create a user with payment methods before viewing transactions.")
+            print(stars + "\n")
+        else:
+            print("Payment methods for this user: ")
+            for i in range(len(userList[currUser].pmList)):
+                print("Enter " + str(i) + " for: " + userList[currUser].pmList[i].name)
+
+            pmSelectedIndex = int(input("\nWhich payment method would you like to view the transactions of? "))
+            pmSelected = userList[currUser].pmList[pmSelectedIndex]
+            #FIXME: need to validate input
+
+            #check if this payment method has categories view
+            if(len(pmSelected.categoryList) == 0):
+                print("\nYou must first create categories for this payment method.")
+                print(stars + "\n")
+            else:
+                print("\nCategories for this payment method:")
+                for i in range(len(pmSelected.categoryList)):
+                    print("Enter " + str(i) + " for: " + pmSelected.categoryList[i].name)
+
+                #FIXME: need to add feature that lets you see transactions of all categories
+                catSelectedIndex = int(input("\nWhich category would you like to view the transactions of? "))
+                catSelected = pmSelected.categoryList[catSelectedIndex]
+
+                if(len(catSelected.catTransList) == 0):
+                    print("\nYou must first add transactions before you can view them.")
+                    print(stars + "\n")
+                else:
+                    print("TRANSACTIONS\n")
+                    for i in catSelected.catTransList:
+                        i.printTrans()
+                        print()
+
+                    print(stars + "\n")
+
+
+
+    if(selection == "8"):
+        print("this selection is not working yet\n" + stars + "\n")
 
 #QUESTIONS
 #Is python the right language for iOS dev?

@@ -11,3 +11,6 @@ class AppUser:
         name = ""
         email = ""
         pmList = []
+
+
+    #FIXME: maybe add an AddPM and RemovePM function
